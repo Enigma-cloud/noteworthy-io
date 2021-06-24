@@ -1,13 +1,13 @@
 // BLOCKS ARE IMPOSSIBLE TO SMOOTHLY DRAG IN FIREFOX, MAYBE USE A SPAN TO CONTAIN THE TEXT INSTEAD?
 
-const addBtns = document.querySelectorAll('.add-btn:not(.solid)');
-const saveItemBtns = document.querySelectorAll('.solid');
-const addItemContainers = document.querySelectorAll('.add-container');
-const addItems = document.querySelectorAll('.add-item');
+// const addBtns = document.querySelectorAll('.add-btn:not(.solid)');
+// const saveItemBtns = document.querySelectorAll('.solid');
+// const addItemContainers = document.querySelectorAll('.add-container');
+// const addItems = document.querySelectorAll('.add-item');
 // Item Lists
 const listColumns = document.querySelectorAll('.drag-item-list');
-
-const dragContainer = document.getElementById('dragContainer');
+// Blocks
+const dragContainer = document.getElementById('drag-container');
 const columnForm = document.getElementById('column-form');
 // Modal window
 const modal = document.getElementById('modal');
@@ -58,10 +58,10 @@ let currentColumn;
 // }
 
 // Filter Arrays to remove empty items
-function filterArray(array) {
-  const filteredArray = array.filter(item => item !== null);
-  return filteredArray;
-}
+// function filterArray(array) {
+//   const filteredArray = array.filter(item => item !== null);
+//   return filteredArray;
+// }
 
 // Show Modal, Focus on Input
 function showModal() {
@@ -102,7 +102,8 @@ function storeColumns(e) {
   const actionCol = {
     name: nameVal,
     numOfActions: minActionsNum,
-    weighting: weight
+    weighting: weight,
+    actionItems: []
   };
   listArrays.push(actionCol);
   updateDOM();
@@ -139,6 +140,7 @@ function createColumn() {
     // Add styling & attributes
     columnEl.classList.add('drag-column');
     // change styling to general column
+    columnEl.setAttribute('block-id', index);
     columnEl.classList.add('backlog-column');
     columnEl.setAttribute('min-num-actions', numOfActions);
     columnEl.setAttribute('column-weight', weighting)
@@ -163,6 +165,9 @@ function createColumn() {
     counter.classList.add('col-counter');
     colSaveBtn.classList.add('add-btn');
     colSaveBtn.classList.add('solid');
+    colSaveBtn.addEventListener('click', () => {
+      hideInputBox(index);
+    })
     colSaveText.textContent = 'Save Item';
     colAddBtn.appendChild(colAddText);
     colSaveBtn.appendChild(colSaveText);
@@ -185,29 +190,35 @@ function createColumn() {
 }
 
 // Create DOM Elements for each action item
-function createItemEl(columnEl, column, item, index) {
+function createItemEl(actionItems, blockInd) {
+  const actionList = document.querySelectorAll('.drag-item-list');
   // List Item
-  const listEl = document.createElement('li');
-  listEl.classList.add('drag-item');
-  listEl.textContent = item;
-  listEl.draggable = true;
-  listEl.setAttribute('ondragstart', 'drag(event)');
+  actionItems.forEach((text, itemInd) => {
+    const listEl = document.createElement('li');
+    listEl.classList.add('drag-item');
+    listEl.textContent = text;
+    listEl.draggable = true;
+    // listEl.setAttribute('ondragstart', 'drag(event)');
 
-  // Temporary solution to Firefox edit or dragging issue
-  listEl.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
-    listEl.contentEditable = true
-  });
-  
-  listEl.id = index;
-  listEl.setAttribute('onfocusout', `updateItem(${index}, ${column})`);
-  // Append
-  columnEl.appendChild(listEl);
+    // Temporary solution to Firefox edit or dragging issue
+    listEl.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      listEl.contentEditable = true
+    });
+    
+    listEl.id = itemInd;
+    listEl.setAttribute('onfocusout', `updateItem(${blockInd}, ${itemInd})`);
+    // Append
+    actionList[blockInd].appendChild(listEl);
+  })
 }
 
 // Update Columns in DOM - Reset HTML, Filter Array, Update localStorage
 function updateDOM() {
   createColumn();
+  listArrays.forEach((block, blockIndex) => {
+    createItemEl(block.actionItems, blockIndex);
+  })
   // Check localStorage once
   // if (!updatedOnLoad) {
   //   getSavedColumns();
@@ -263,29 +274,31 @@ function updateColumnCounter() {
 }
 
 // Update Item - Delete if necessary, or update Array value
-// function updateItem(id, column) {
-//   const selectedArray = listArrays[column];
-//   const selectedColumnEl = listColumns[column].children;
-//   // Remove item if empty and is not being dragged
-//   if (!dragging) {
-//     if (!selectedColumnEl[id].textContent) {
-//       delete selectedArray[id];
-//     }
-//     else {
-//       selectedArray[id] = selectedColumnEl[id].textContent;
-//     }
-//     updateDOM();
-//   }
-// }
+function updateItem(blockInd, itemInd) {
+  const selectedArray = listArrays[blockInd].actionItems;
+  const selectedColumnEl = document.querySelectorAll('.drag-item-list')[blockInd].children;
+  
+  // Remove item if empty and is not being dragged
+  // if (!dragging) {
+    if (!selectedColumnEl[itemInd].textContent) {
+      delete selectedArray[itemInd];
+    }
+    else {
+      selectedArray[itemInd] = selectedColumnEl[itemInd].textContent;
+    }
+    updateDOM();
+  // }
+}
 
 // Add new item to column list -> Reset textbox
 function addToColumn(column) {
+  let addItems = document.querySelectorAll('.add-item');
   const itemText = addItems[column].textContent;
   if (!itemText) {
     // Close if input box empty
     return 
   }
-  const selectedArray = listArrays[column];
+  const selectedArray = listArrays[column].actionItems;
   selectedArray.push(itemText);
   addItems[column].textContent = "";
   updateDOM();
@@ -293,14 +306,21 @@ function addToColumn(column) {
 
 // Show Add Item input box
 function showInputBox(column) {
-  // addBtns[column].style.visibility = 'hidden';
-  // saveItemBtns[column].style.display = 'flex';
-  // addItemContainers[column].style.display = 'flex';
-  console.log('showInputBox');
+  let addBtns = document.querySelectorAll('.add-btn:not(.solid)');
+  let saveItemBtns = document.querySelectorAll('.solid');
+  let addItemContainers = document.querySelectorAll('.add-container');
+
+  addBtns[column].style.visibility = 'hidden';
+  saveItemBtns[column].style.display = 'flex';
+  addItemContainers[column].style.display = 'flex';
 }
 
 // Hide Add Item input box
 function hideInputBox(column) {
+  let addBtns = document.querySelectorAll('.add-btn:not(.solid)');
+  let saveItemBtns = document.querySelectorAll('.solid');
+  let addItemContainers = document.querySelectorAll('.add-container');
+
   addBtns[column].style.visibility = 'visible';
   saveItemBtns[column].style.display = 'none';
   addItemContainers[column].style.display = 'none';
