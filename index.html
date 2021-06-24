@@ -3,50 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Compass</title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Promise-IOTA</title>
+    <link rel="icon" type="image/png" href="/images/logo/favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.min.css"/>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1 class="main-title">Daily Compass ALPHA</h1>
+    <div class="bg-image"></div>
 
-    <div class="drag-container" id="dragContainer">
-        <ul class="drag-list">
+    <div class="content-container">
+        <h1 class="main-title">Promise-IOTA</h1>
 
-        </ul>
-    </div>
+        <div class="drag-container" id="dragContainer">
+            <ul class="drag-list">
 
-    <div class="modal-container" id="modal">
-        <div class="modal">
-            <i class="fas fa-times close-icon" id="close-modal"></i>
-            <div class="modal-header">
-                <h3>Add Category</h3>
-            </div>
-            <div class="modal-content">
-                <form id="column-form">
-                    <!-- Column Name -->
-                    <div class="form-group">
-                        <label for="column-name" class="form-label">Category Name</label>
-                        <input type="text" class="form-input" id="column-name">
-                    </div>
-                    <!-- Column Number of Actions -->
-                    <div class="form-group">
-                        <label for="column-url" class="form-label">Minimum Completed Actions</label>
-                        <input type="text" class="form-input" id="min-num-actions">
-                    </div>
-                    <!-- Column Weighting -->
-                    <div class="form-group">
-                        <label for="column-url" class="form-label">Weighting</label>
-                        <input type="text" class="form-input" id="column-weight">
-                    </div>
-                    <button type="submit">Save</button>
-                </form>
+            </ul>
+        </div>
+
+        <div class="modal-container" id="modal">
+            <div class="modal">
+                <i class="fas fa-times close-icon" id="close-modal"></i>
+                <div class="modal-header">
+                    <h3>Add Category</h3>
+                </div>
+                <div class="modal-content">
+                    <form id="column-form">
+                        <!-- Column Name -->
+                        <div class="form-group">
+                            <label for="column-name" class="form-label">Category Name</label>
+                            <input type="text" class="form-input" id="column-name">
+                        </div>
+                        <!-- Column Number of Actions -->
+                        <div class="form-group">
+                            <label for="column-url" class="form-label">Minimum Completed Actions</label>
+                            <input type="text" class="form-input" id="min-num-actions">
+                        </div>
+                        <!-- Column Weighting -->
+                        <div class="form-group">
+                            <label for="column-url" class="form-label">Weighting</label>
+                            <input type="text" class="form-input" id="column-weight">
+                        </div>
+                        <button type="submit">Save</button>
+                    </form>
+                </div>
             </div>
         </div>
+        <div class="add-col-btn" id="show-modal"> + </div>
     </div>
-
-    <div class="add-col-btn" id="show-modal"> + </div>
     <!-- Script -->
     <script src="script.js"></script>
 </body>

@@ -13,7 +13,7 @@ html {
 
 body {
   margin: 0;
-  background: url("./images/panda.jpg");
+  background: url("./images/background/panda.jpg");
   background-size: cover;
   background-position: 50% 60%;
   background-attachment: fixed;
