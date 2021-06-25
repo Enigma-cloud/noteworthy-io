@@ -11,35 +11,8 @@ Notes:
 3) Ability to create & edit action items [A]
 4) Ability to 'check' items from a column 
 5) Gather numerical data from each column
-6) Use gathered numerical data to be graphed on another page
+6) Use gathered numerical data to be graphed
 7) Ability to drag and drop items [A]
-
-            <!-- Backlog Column -->
-            <li class="drag-column backlog-column">
-                <span class="header">
-                    <h1>Backlog</h1>
-                </span>
-                <!-- Backlog Content -->
-                <div id="backlog-content" class="custom-scroll">
-                    <ul class="drag-item-list" id="backlog-list" ondrop="drop(event)" 
-                    ondragover="allowDrop(event)" ondragenter="dragEnter(0)">
-                        <li class="drag-item" draggable="true">
-                            TEST DRAGGABLE ITEM
-                        </li>
-                    </ul>
-                </div>
-                <!-- Add Button Group -->
-                <div class="add-btn-group" >
-                    <div class="add-btn" onclick="showInputBox(0)">
-                        <span class="plus-sign">+</span>
-                        <span>Add Item</span>
-                    </div>
-                    <div class="col-counter"></div>
-                    <div class="add-btn solid" onclick="hideInputBox(0)">
-                        <span>Save Item</span>
-                    </div>
-                </div>
-                <div class="add-container">
-                    <div class="add-item" contenteditable="true"></div>
-                </div>
-            </li>
+8) Ability to label action items (e.g. Eisenhower matrix)
+9) Ability to change colour scheme of a block (during & after creation)
+10) A minimal and modern navigation bar
