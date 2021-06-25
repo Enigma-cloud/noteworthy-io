@@ -164,7 +164,7 @@ h3 {
 }
 
 /* Columns */
-.drag-column {
+.drag-block {
   flex: 1;
   margin: 0 10px;
   position: relative;
@@ -173,33 +173,13 @@ h3 {
   overflow-x: hidden;
 }
 
-.backlog-column .header,
-.backlog-column .solid,
-.backlog-column .solid:hover,
-.backlog-column .over {
+.action-block .header,
+.action-block .solid,
+.action-block .solid:hover,
+.action-block .over {
   background-color: var(--column-1);
 }
 
-.progress-column .header,
-.progress-column .solid,
-.progress-column .solid:hover,
-.progress-column .over {
-  background-color: var(--column-2);
-}
-
-.complete-column .header,
-.complete-column .solid,
-.complete-column .solid:hover,
-.complete-column .over {
-  background-color: var(--column-3);
-}
-
-.on-hold-column .header,
-.on-hold-column .solid,
-.on-hold-column .solid:hover,
-.on-hold-column .over {
-  background-color: var(--column-4);
-}
 
 /* Custom Scrollbar */
 .custom-scroll {
@@ -364,7 +344,7 @@ h3 {
     display: block;
   }
 
-  .drag-column {
+  .drag-block {
     margin: 10px;
   }
 }

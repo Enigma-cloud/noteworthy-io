@@ -1,27 +1,23 @@
 // BLOCKS ARE IMPOSSIBLE TO SMOOTHLY DRAG IN FIREFOX, MAYBE USE A SPAN TO CONTAIN THE TEXT INSTEAD?
 
-// const addBtns = document.querySelectorAll('.add-btn:not(.solid)');
-// const saveItemBtns = document.querySelectorAll('.solid');
-// const addItemContainers = document.querySelectorAll('.add-container');
-// const addItems = document.querySelectorAll('.add-item');
-// Item Lists
-const listColumns = document.querySelectorAll('.drag-item-list');
 // Blocks
 const dragContainer = document.getElementById('drag-container');
-const columnForm = document.getElementById('column-form');
+const blockForm = document.getElementById('block-form');
 // Modal window
 const modal = document.getElementById('modal');
 const modalShow = document.getElementById('show-modal');
 const modalClose = document.getElementById('close-modal');
-const colName = document.getElementById('column-name');
+const colName = document.getElementById('block-name');
 const minActions = document.getElementById('min-num-actions');
-const colWeight = document.getElementById('column-weight');
+const colWeight = document.getElementById('block-weight');
 
 // Items
 let updatedOnLoad = false;
 
 // Initialize Arrays
-let listArrays = [];
+let blockList;
+let blockArrays;
+let blockObjects = [];
 
 // Drag Functionality
 let draggedItem;
@@ -99,15 +95,15 @@ function storeColumns(e) {
   // Store columns for local storage - B
   // 
   // 
-  const actionCol = {
+  const actionData = {
     name: nameVal,
     numOfActions: minActionsNum,
     weighting: weight,
     actionItems: []
   };
-  listArrays.push(actionCol);
+  blockObjects.push(actionData);
   updateDOM();
-  columnForm.reset();
+  blockForm.reset();
   colName.focus();
 }
 
@@ -116,10 +112,10 @@ function createColumn() {
   // Reset content
   dragContainer.textContent = '';
 
-  listArrays.forEach((actionCol, index) => {
-    const { name, numOfActions, weighting } = actionCol;
+  blockObjects.forEach((actionData, index) => {
+    const { name, numOfActions, weighting } = actionData;
     // Create column parts
-    const columnEl = document.createElement('li');
+    const actionBlock = document.createElement('li');
     const titleSpan = document.createElement('span');
     const titleText = document.createElement('h1');
     
@@ -138,21 +134,19 @@ function createColumn() {
     const textData = document.createElement('div');
 
     // Add styling & attributes
-    columnEl.classList.add('drag-column');
-    // change styling to general column
-    columnEl.setAttribute('block-id', index);
-    columnEl.classList.add('backlog-column');
-    columnEl.setAttribute('min-num-actions', numOfActions);
-    columnEl.setAttribute('column-weight', weighting)
+    actionBlock.classList.add('drag-block');
+    actionBlock.classList.add('action-block');
+    actionBlock.setAttribute('min-num-actions', numOfActions);
+    actionBlock.setAttribute('column-weight', weighting)
     titleSpan.classList.add('header');
     titleText.textContent = name;
     titleSpan.appendChild(titleText);
 
     contentGroup.classList.add('custom-scroll');
     actionList.classList.add('drag-item-list');
-    // actionList.setAttribute('ondrop', 'drop(event)');
-    // actionList.setAttribute('ondragover', 'allowDrop(event)');
-    // actionList.setAttribute('ondragover', 'ondragenter(${listArrays.length-1})');
+    actionList.setAttribute('ondrop', 'drop(event)');
+    actionList.setAttribute('ondragover', 'allowDrop(event)');
+    actionList.setAttribute('ondragenter', `dragEnter(${index})`);
     contentGroup.appendChild(actionList);
 
     buttonGroup.classList.add('add-btn-group');
@@ -181,24 +175,24 @@ function createColumn() {
     textContainer.appendChild(textData);
 
     // Assemble column
-    columnEl.appendChild(titleSpan);
-    columnEl.appendChild(contentGroup);
-    columnEl.appendChild(buttonGroup);
-    columnEl.appendChild(textContainer);
-    dragContainer.appendChild(columnEl);
+    actionBlock.appendChild(titleSpan);
+    actionBlock.appendChild(contentGroup);
+    actionBlock.appendChild(buttonGroup);
+    actionBlock.appendChild(textContainer);
+    dragContainer.appendChild(actionBlock);
   });
 }
 
 // Create DOM Elements for each action item
 function createItemEl(actionItems, blockInd) {
-  const actionList = document.querySelectorAll('.drag-item-list');
+  blockList = document.querySelectorAll('.drag-item-list');
   // List Item
   actionItems.forEach((text, itemInd) => {
     const listEl = document.createElement('li');
     listEl.classList.add('drag-item');
     listEl.textContent = text;
     listEl.draggable = true;
-    // listEl.setAttribute('ondragstart', 'drag(event)');
+    listEl.setAttribute('ondragstart', 'drag(event)');
 
     // Temporary solution to Firefox edit or dragging issue
     listEl.addEventListener('contextmenu', (e) => {
@@ -209,14 +203,14 @@ function createItemEl(actionItems, blockInd) {
     listEl.id = itemInd;
     listEl.setAttribute('onfocusout', `updateItem(${blockInd}, ${itemInd})`);
     // Append
-    actionList[blockInd].appendChild(listEl);
+    blockList[blockInd].appendChild(listEl);
   })
 }
 
 // Update Columns in DOM - Reset HTML, Filter Array, Update localStorage
 function updateDOM() {
   createColumn();
-  listArrays.forEach((block, blockIndex) => {
+  blockObjects.forEach((block, blockIndex) => {
     createItemEl(block.actionItems, blockIndex);
   })
   // Check localStorage once
@@ -260,26 +254,26 @@ function updateDOM() {
 }
 
 // Update column counters
-function updateColumnCounter() {
-  let counters = document.querySelectorAll('.col-counter');
-  counters.forEach((i, index) => {
-    if (listArrays[index].length > 0) {
-      i.style.display = 'flex';
-      i.textContent = `${listArrays[index].length}`;
-    }
-    else {
-      i.style.display = 'none';
-    }
-  });
-}
+// function updateColumnCounter() {
+//   let counters = document.querySelectorAll('.col-counter');
+//   counters.forEach((i, index) => {
+//     if (blockObjects[index].length > 0) {
+//       i.style.display = 'flex';
+//       i.textContent = `${blockObjects[index].length}`;
+//     }
+//     else {
+//       i.style.display = 'none';
+//     }
+//   });
+// }
 
 // Update Item - Delete if necessary, or update Array value
 function updateItem(blockInd, itemInd) {
-  const selectedArray = listArrays[blockInd].actionItems;
+  const selectedArray = blockObjects[blockInd].actionItems;
   const selectedColumnEl = document.querySelectorAll('.drag-item-list')[blockInd].children;
   
   // Remove item if empty and is not being dragged
-  // if (!dragging) {
+  if (!dragging) {
     if (!selectedColumnEl[itemInd].textContent) {
       delete selectedArray[itemInd];
     }
@@ -287,18 +281,20 @@ function updateItem(blockInd, itemInd) {
       selectedArray[itemInd] = selectedColumnEl[itemInd].textContent;
     }
     updateDOM();
-  // }
+  }
 }
 
 // Add new item to column list -> Reset textbox
 function addToColumn(column) {
-  let addItems = document.querySelectorAll('.add-item');
+  const addItems = document.querySelectorAll('.add-item');
+  const selectedArray = blockObjects[column].actionItems;
   const itemText = addItems[column].textContent;
+
   if (!itemText) {
     // Close if input box empty
     return 
   }
-  const selectedArray = listArrays[column].actionItems;
+  
   selectedArray.push(itemText);
   addItems[column].textContent = "";
   updateDOM();
@@ -328,53 +324,55 @@ function hideInputBox(column) {
 }
 
 // Update arrays after Drag & Drop change
-// function rebuildArrays() {
-//   // Reset arrays and repopulate with data
-//   backlogListArray = Array.from(backlogList.children).map(item => item.textContent);
-//   progressListArray = Array.from(progressList.children).map(item => item.textContent);
-//   completeListArray = Array.from(completeList.children).map(item => item.textContent);
-//   onHoldListArray = Array.from(onHoldList.children).map(item => item.textContent);
-//   // Update DOM
-//   updateDOM();
-// }
+function rebuildArrays() {
+  // Reset arrays and repopulate with data
+  blockList = document.querySelectorAll('.drag-item-list');
+  for (i = 0; i < blockList.length; i++) {
+    blockObjects[i].actionItems = Array.from(blockList[i].children).map(item => item.textContent);
+  }
+  // Update DOM
+  updateDOM();
+}
 
 /** Drag & Drop Functionality */
 // When Item Starts Dragging
-// function drag(e) {
-//   draggedItem = e.target;
-//   dragging = true;
-// }
+function drag(e) {
+  draggedItem = e.target;
+  dragging = true;
+}
 
 // When a draggable item enters a column (drop area)
-// function dragEnter(column) {
-//   listColumns[column].classList.add('over');
-//   currentColumn = column;
-// }
+function dragEnter(column) {
+  blockList = document.querySelectorAll('.drag-item-list');
+  blockList[column].classList.add('over');
+  currentColumn = column;
+}
 
 // Allow items to be dragged into columns
-// function allowDrop(e) {
-//   e.preventDefault();
-// }
+function allowDrop(e) {
+  e.preventDefault();
+}
 
 // Dropping items into columns
-// function drop(e) {
-//   e.preventDefault();
-//   // Remove Background Color/Padding
-//   listColumns.forEach((column) => {
-//     column.classList.remove('over');
-//   });
-//   // Add item to column (frontend effect)
-//   const parent = listColumns[currentColumn];
-//   parent.appendChild(draggedItem);
-//   // Dragging complete
-//   dragging = false;
-//   // Update to reflect change in the columns
-//   rebuildArrays();
-// }
+function drop(e) {
+  e.preventDefault();
+  blockList = document.querySelectorAll('.drag-item-list');
+  // Remove Background Color/Padding
+  blockList.forEach((column) => {
+    column.classList.remove('over');
+  });
+  // Add item to column (frontend effect)
+  const parent = blockList[currentColumn];
+  parent.appendChild(draggedItem);
+  // Dragging complete
+  dragging = false;
+  // Update to reflect change in the columns
+  rebuildArrays();
+}
 
 
 // Event Listeners
-columnForm.addEventListener('submit', storeColumns);
+blockForm.addEventListener('submit', storeColumns);
 // Modal Event Listeners
 modalShow.addEventListener('click', showModal);
 modalClose.addEventListener('click', () => modal.classList.remove('show-modal'));
