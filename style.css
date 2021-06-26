@@ -206,13 +206,24 @@ h3 {
 
 .header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
   border-radius: 10px;
   margin: 10px;
+  padding: 0 10px 0 10px;
 }
 
 .header h1 {
   font-size: 1.25rem;
+}
+
+.header i {
+  font-size: 1.1rem;
+  filter: brightness(90%);
+}
+
+.header i:hover {
+  filter: brightness(110%);
 }
 
 /* Drag and Drop */

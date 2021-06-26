@@ -16,3 +16,6 @@ Notes:
 8) Ability to label action items (e.g. Eisenhower matrix)
 9) Ability to change colour scheme of a block (during & after creation)
 10) A minimal and modern navigation bar
+11) Ability to remove unused blocks [A]
+12) Store blocks in local storage [A]
+13) Save a snapshot of the data

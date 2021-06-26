@@ -26,38 +26,61 @@ let currentColumn;
 
 
 // Get Arrays from localStorage if available, set default values if not
-// function getSavedColumns() {
-//   if (localStorage.getItem('backlogItems')) {
-//     backlogListArray = JSON.parse(localStorage.backlogItems);
-//     progressListArray = JSON.parse(localStorage.progressItems);
-//     completeListArray = JSON.parse(localStorage.completeItems);
-//     onHoldListArray = JSON.parse(localStorage.onHoldItems);
-//   } 
-//   else {
-//     backlogListArray = ['Release the course', 'Sit back and relax'];
-//     progressListArray = ['Work on projects', 'Listen to music'];
-//     completeListArray = ['Being cool', 'Getting stuff done'];
-//     onHoldListArray = ['Being uncool'];
-//   }
-// }
+function getSavedColumns() {
+  if (localStorage.getItem('blocks') && !localStorage.getItem('blocks').length === 0) {
+    blockObjects = JSON.parse(localStorage.blocks);
+  }
+  else {
+    // Create default blocks
+    const toDo = {
+      name: 'To do',
+      numOfActions: '10',
+      weighting: '10',
+      actionItems: ['Release the course', 'Sit back and relax']
+    };
+    const inProgress = {
+      name: 'In-progress',
+      numOfActions: '10',
+      weighting: '10',
+      actionItems: ['Work on projects', 'Listen to music']
+    };
+    const completed = {
+      name: 'Completed',
+      numOfActions: '10',
+      weighting: '10',
+      actionItems: ['Being cool', 'Getting stuff done']
+    };
+    // Push into main array
+    blockObjects.push(toDo);
+    blockObjects.push(inProgress);
+    blockObjects.push(completed);
+  }
+  
+}
+
+function storeBlocks(name, data) {
+  if (!name && !data) {
+    return false
+  }
+  localStorage.setItem(`${name}`, JSON.stringify(data));
+}
 
 // Set localStorage Arrays
 // function updateSavedColumns() {
-//   listArrays = [backlogListArray, progressListArray, completeListArray,
-//   onHoldListArray];
+//   const blockNames = Array.from(listArrays).map(block => block.name);
+//   console.log(blockNames)
 //   const arrayNames = ['backlog', 'progress','complete', 'onHold'];
 
 //   arrayNames.forEach((arrayName, index) => {
 //     localStorage.setItem(`${arrayName}Items`, JSON.stringify(listArrays[index]));
 //   });
-//   return false
 // }
 
 // Filter Arrays to remove empty items
-// function filterArray(array) {
-//   const filteredArray = array.filter(item => item !== null);
-//   return filteredArray;
-// }
+function filterArray(array) {
+  const filteredArray = array.filter(item => item !== null);
+  return filteredArray;
+}
 
 // Show Modal, Focus on Input
 function showModal() {
@@ -92,9 +115,6 @@ function storeColumns(e) {
     return false;
   }
 
-  // Store columns for local storage - B
-  // 
-  // 
   const actionData = {
     name: nameVal,
     numOfActions: minActionsNum,
@@ -102,9 +122,25 @@ function storeColumns(e) {
     actionItems: []
   };
   blockObjects.push(actionData);
+
+  // Store in local storage
+  storeBlocks('blocks', blockObjects);
+
   updateDOM();
   blockForm.reset();
   colName.focus();
+}
+
+function deleteBlock(blockName) {
+  // Find block
+  blockObjects.forEach((block, index) => {
+    if (block.name === blockName) {
+      blockObjects.splice(index, 1);
+    }
+  });
+  // Update local storage
+  storeBlocks('blocks', blockObjects);
+  updateDOM();
 }
 
 // Create Columns to store action items
@@ -118,6 +154,7 @@ function createColumn() {
     const actionBlock = document.createElement('li');
     const titleSpan = document.createElement('span');
     const titleText = document.createElement('h1');
+    const closeBlock = document.createElement('i');
     
     const contentGroup = document.createElement('div');
     const actionList = document.createElement('ul');
@@ -126,7 +163,7 @@ function createColumn() {
     const colAddBtn = document.createElement('div');
     const colAddText = document.createElement('span');
     
-    const counter = document.createElement('div');
+    // const counter = document.createElement('div');
 
     const colSaveBtn = document.createElement('div');
     const colSaveText = document.createElement('span');
@@ -139,8 +176,19 @@ function createColumn() {
     actionBlock.setAttribute('min-num-actions', numOfActions);
     actionBlock.setAttribute('column-weight', weighting)
     titleSpan.classList.add('header');
+    closeBlock.setAttribute('id', 'close-block');
+    closeBlock.classList.add('fas');
+    closeBlock.classList.add('fa-times');
+    closeBlock.addEventListener('click', () => {
+      if (!confirm(`Did you want to remove "${name}" block?`)) {
+        return
+      }
+      const blockName = name;
+      deleteBlock(blockName);
+    });
     titleText.textContent = name;
     titleSpan.appendChild(titleText);
+    titleSpan.appendChild(closeBlock);
 
     contentGroup.classList.add('custom-scroll');
     actionList.classList.add('drag-item-list');
@@ -156,7 +204,7 @@ function createColumn() {
     });
     colAddText.classList.add('plus-sign');
     colAddText.textContent = '+';
-    counter.classList.add('col-counter');
+    // counter.classList.add('col-counter');
     colSaveBtn.classList.add('add-btn');
     colSaveBtn.classList.add('solid');
     colSaveBtn.addEventListener('click', () => {
@@ -166,7 +214,7 @@ function createColumn() {
     colAddBtn.appendChild(colAddText);
     colSaveBtn.appendChild(colSaveText);
     buttonGroup.appendChild(colAddBtn);
-    buttonGroup.appendChild(counter);
+    // buttonGroup.appendChild(counter);
     buttonGroup.appendChild(colSaveBtn);
 
     textContainer.classList.add('add-container');
@@ -209,48 +257,19 @@ function createItemEl(actionItems, blockInd) {
 
 // Update Columns in DOM - Reset HTML, Filter Array, Update localStorage
 function updateDOM() {
+  // Check localStorage once
+  if (!updatedOnLoad) {
+    getSavedColumns();
+  }
+
   createColumn();
   blockObjects.forEach((block, blockIndex) => {
-    createItemEl(block.actionItems, blockIndex);
-  })
-  // Check localStorage once
-  // if (!updatedOnLoad) {
-  //   getSavedColumns();
-  // }
-
-  // // Backlog Column
-  // backlogList.textContent = '';
-  // backlogListArray.forEach((listItem, index) => {
-  //   createItemEl(backlogList, 0, listItem, index);
-  // });
-  // backlogListArray = filterArray(backlogListArray);
-
-  // // Progress Column
-  // progressList.textContent = '';
-  // progressListArray.forEach((listItem, index) => {
-  //   createItemEl(progressList, 1, listItem, index);
-  // });
-  // progressListArray = filterArray(progressListArray);
-
-  // // Complete Column
-  // completeList.textContent = '';
-  // completeListArray.forEach((listItem, index) => {
-  //   createItemEl(completeList, 2, listItem, index);
-  // });
-  // completeListArray = filterArray(completeListArray);
-
-  // // On Hold Column
-  // onHoldList.textContent = '';
-  // onHoldListArray.forEach((listItem, index) => {
-  //   createItemEl(onHoldList, 3, listItem, index);
-  // });
-  // onHoldListArray = filterArray(onHoldListArray);
-
+    let filteredActions = filterArray(block.actionItems);
+    createItemEl(filteredActions, blockIndex);
+  });
   
   // Run getSavedColumns only once, Update Local Storage
-  // updatedOnLoad = true;
-  // updateSavedColumns();
-  // updateColumnCounter();
+  updatedOnLoad = true;
 }
 
 // Update column counters
@@ -378,5 +397,5 @@ modalShow.addEventListener('click', showModal);
 modalClose.addEventListener('click', () => modal.classList.remove('show-modal'));
 window.addEventListener('click', (e) => (e.target === modal ? modal.classList.remove('show-modal') : false));
 // On Load
-// updateDOM();
+updateDOM();
 
