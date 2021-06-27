@@ -7,9 +7,10 @@ const blockForm = document.getElementById('block-form');
 const modal = document.getElementById('modal');
 const modalShow = document.getElementById('show-modal');
 const modalClose = document.getElementById('close-modal');
-const colName = document.getElementById('block-name');
+const blockName = document.getElementById('block-name');
 const minActions = document.getElementById('min-num-actions');
-const colWeight = document.getElementById('block-weight');
+const blockWeight = document.getElementById('block-weight');
+const blockColour = document.getElementById('block-colour');
 
 // Items
 let updatedOnLoad = false;
@@ -36,18 +37,21 @@ function getSavedColumns() {
       name: 'To do',
       numOfActions: '10',
       weighting: '10',
+      colour: '#292f36',
       actionItems: ['Release the course', 'Sit back and relax']
     };
     const inProgress = {
       name: 'In-progress',
       numOfActions: '10',
       weighting: '10',
+      colour: '#ffe66d',
       actionItems: ['Work on projects', 'Listen to music']
     };
     const completed = {
       name: 'Completed',
       numOfActions: '10',
       weighting: '10',
+      colour: '#44cf6c',
       actionItems: ['Being cool', 'Getting stuff done']
     };
     // Push into main array
@@ -58,7 +62,7 @@ function getSavedColumns() {
   
 }
 
-function storeBlocks(name, data) {
+function saveBlock(name, data) {
   if (!name && !data) {
     return false
   }
@@ -85,7 +89,7 @@ function filterArray(array) {
 // Show Modal, Focus on Input
 function showModal() {
 	modal.classList.add('show-modal');
-  colName.focus();
+  blockName.focus();
 }
 
 // Validate new column
@@ -105,11 +109,18 @@ function validateCol(nameValue, actionsValue, weightValue) {
   return true;
 }
 
-function storeColumns(e) {
+// Change block colour
+function changeBlockColour(block, color) {
+  block.style.backgroundColor = color;
+}
+
+// Save and store blocks
+function storeBlocks(e) {
   e.preventDefault();
-  const nameVal = colName.value;
+  let nameVal = blockName.value;
   let minActionsNum = minActions.value;
-  let weight = colWeight.value;
+  let weight = blockWeight.value;
+  let colourVal = blockColour.value;
   
   if (!validateCol(nameVal, minActionsNum, weight)) {
     return false;
@@ -119,16 +130,17 @@ function storeColumns(e) {
     name: nameVal,
     numOfActions: minActionsNum,
     weighting: weight,
+    colour: colourVal,
     actionItems: []
   };
   blockObjects.push(actionData);
 
   // Store in local storage
-  storeBlocks('blocks', blockObjects);
+  saveBlock('blocks', blockObjects);
 
   updateDOM();
   blockForm.reset();
-  colName.focus();
+  blockName.focus();
 }
 
 function deleteBlock(blockName) {
@@ -139,7 +151,7 @@ function deleteBlock(blockName) {
     }
   });
   // Update local storage
-  storeBlocks('blocks', blockObjects);
+  saveBlock('blocks', blockObjects);
   updateDOM();
 }
 
@@ -149,7 +161,7 @@ function createColumn() {
   dragContainer.textContent = '';
 
   blockObjects.forEach((actionData, index) => {
-    const { name, numOfActions, weighting } = actionData;
+    const { name, numOfActions, weighting, colour} = actionData;
     // Create column parts
     const actionBlock = document.createElement('li');
     const titleSpan = document.createElement('span');
@@ -162,8 +174,6 @@ function createColumn() {
     const buttonGroup = document.createElement('div');
     const colAddBtn = document.createElement('div');
     const colAddText = document.createElement('span');
-    
-    // const counter = document.createElement('div');
 
     const colSaveBtn = document.createElement('div');
     const colSaveText = document.createElement('span');
@@ -189,6 +199,8 @@ function createColumn() {
     titleText.textContent = name;
     titleSpan.appendChild(titleText);
     titleSpan.appendChild(closeBlock);
+    // Change colour
+    changeBlockColour(titleSpan, colour);
 
     contentGroup.classList.add('custom-scroll');
     actionList.classList.add('drag-item-list');
@@ -204,7 +216,6 @@ function createColumn() {
     });
     colAddText.classList.add('plus-sign');
     colAddText.textContent = '+';
-    // counter.classList.add('col-counter');
     colSaveBtn.classList.add('add-btn');
     colSaveBtn.classList.add('solid');
     colSaveBtn.addEventListener('click', () => {
@@ -214,7 +225,6 @@ function createColumn() {
     colAddBtn.appendChild(colAddText);
     colSaveBtn.appendChild(colSaveText);
     buttonGroup.appendChild(colAddBtn);
-    // buttonGroup.appendChild(counter);
     buttonGroup.appendChild(colSaveBtn);
 
     textContainer.classList.add('add-container');
@@ -391,7 +401,7 @@ function drop(e) {
 
 
 // Event Listeners
-blockForm.addEventListener('submit', storeColumns);
+blockForm.addEventListener('submit', storeBlocks);
 // Modal Event Listeners
 modalShow.addEventListener('click', showModal);
 modalClose.addEventListener('click', () => modal.classList.remove('show-modal'));

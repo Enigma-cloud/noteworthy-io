@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="bg-image"></div>
-
     <div class="content-container">
         <h1 class="main-title">Promise-IOTA</h1>
 
@@ -30,20 +28,25 @@
                     <form id="block-form">
                         <!-- Block Name -->
                         <div class="form-group">
-                            <label for="block-name" class="form-label">Block Name</label>
+                            <label for="block-name" class="form-label">Name</label>
                             <input type="text" class="form-input" id="block-name">
                         </div>
                         <!-- Block Number of Actions -->
                         <div class="form-group">
-                            <label for="block-url" class="form-label">Minimum Completed Actions</label>
+                            <label for="min-num-actions" class="form-label">Minimum Completed Actions</label>
                             <input type="text" class="form-input" id="min-num-actions">
                         </div>
                         <!-- Block Weighting -->
                         <div class="form-group">
-                            <label for="block-url" class="form-label">Weighting</label>
+                            <label for="block-weight" class="form-label">Weighting</label>
                             <input type="text" class="form-input" id="block-weight">
                         </div>
-                        <button type="submit">Save</button>
+                        <!-- Block Colour -->
+                        <div class="form-group">
+                            <label for="block-colour" class="form-label">Colour</label>
+                            <input type="color" class="form-input" id="block-colour" value="#44cf6c">
+                        </div>
+                        <button type="submit" id="save-btn">Save</button>
                     </form>
                 </div>
             </div>
