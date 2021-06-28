@@ -5,10 +5,11 @@ html {
 }
 
 :root {
-  --column-1: #292F36;
-  --column-2: #FFE66D;
-  --column-3: #44CF6C;
-  --column-4: #FF6B6B;
+  --dark-1: #292F36;
+  --yellow-1: #FFE66D;
+  --green-1: #44CF6C;
+  --red-1: #FF6B6B;
+  --add-block: 60px;
 }
 
 body {
@@ -21,6 +22,7 @@ body {
   color: white;
   font-family: 'Source Code Pro', monospace;
   overflow-y: hidden;
+  max-width: 1200px;
 }
 
 h1 {
@@ -45,31 +47,33 @@ ul {
   flex-wrap: wrap;
 }
 
-/* Floating action button */
-.add-col-btn {
+
+/* Floating add button */
+.add-modal-btn {
   cursor: pointer;
-  width: clamp(40px, 10%, 70px);
-  height: clamp(40px, 10%, 70px);
-  background-color: var(--column-1);
+  width: var(--add-block);
+  height: var(--add-block);
+  background-color: var(--dark-1);
   border-radius: 50%;
-  box-shadow: 0 6px 10px 0 black;
+  box-shadow: 0 4px 6px 0 black;
   transition: all 0.2s ease-in-out;
 
   font-size: 40px;
   color: white;
   text-align: center;
-  line-height: 70px;
+  line-height: var(--add-block);
 
   position: fixed;
   right: 50px;
   bottom: 50px;
 }
 
-.add-col-btn:hover {
+.add-modal-btn:hover {
   box-shadow: 0 6px 14px 0 black;
   transform: scale(1.2);
   filter: brightness(110%);
 }
+
 
 /* Modal */
 .modal-container {
@@ -89,7 +93,7 @@ ul {
 }
 
 .modal {
-  background: var(--column-1);
+  background: var(--dark-1);
   box-shadow:  0 0 10px rgba(0, 0, 0, 0.8);
   max-width: 95%;
   width: 500px;
@@ -122,7 +126,7 @@ ul {
 }
 
 .modal-header {
-  background: var(--column-4);
+  background: var(--red-1);
   color: white;
   padding: 15px;
 }
@@ -133,8 +137,9 @@ h3 {
 
 .modal-content {
   padding: 20px;
-  background: var(--column-1);
+  background: var(--dark-1);
 }
+
 
 /* Form */
 .form-group {
@@ -164,7 +169,8 @@ h3 {
   align-items: flex-start;
 }
 
-/* Columns */
+
+/* Blocks */
 .drag-block {
   flex: 1;
   margin: 0 10px;
@@ -178,16 +184,33 @@ h3 {
 .action-block .solid,
 .action-block .solid:hover,
 .action-block .over {
-  background-color: var(--column-1);
+  background-color: var(--dark-1);
 }
 
 #block-colour {
   width: 15%;
 }
 
-#save-btn {
+#add-block {
   width: 15%;
 }
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: var(--dark-1);
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content button {
+  color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
 
 /* Custom Scrollbar */
 .custom-scroll {
@@ -234,6 +257,7 @@ h3 {
   filter: brightness(110%);
 }
 
+
 /* Drag and Drop */
 .over {
   padding: 50px 10px;
@@ -264,6 +288,7 @@ h3 {
 .drag-item:hover {
   filter: brightness(110%);
 }
+
 
 /* Add Button Group */
 .add-btn-group {
@@ -331,19 +356,6 @@ h3 {
 
 .add-item:focus {
   outline: none;
-}
-
-.col-counter {
-  background-color: rgba(255, 255, 255, 0.9);
-  color: black;
-  margin: 10px;
-  padding: 5px 10px;
-  display: flex;
-  align-items: center;
-  width: fit-content;
-  border-radius: 5px;
-  transition: all 0.3s ease-in;
-  user-select: none;
 }
 
 /* Media Query: Laptop */

@@ -1,18 +1,18 @@
-// BLOCKS ARE IMPOSSIBLE TO SMOOTHLY DRAG IN FIREFOX, MAYBE USE A SPAN TO CONTAIN THE TEXT INSTEAD?
-
 // Blocks
 const dragContainer = document.getElementById('drag-container');
 const blockForm = document.getElementById('block-form');
-// Modal window
-const modal = document.getElementById('modal');
-const modalShow = document.getElementById('show-modal');
-const modalClose = document.getElementById('close-modal');
 const blockName = document.getElementById('block-name');
 const minActions = document.getElementById('min-num-actions');
 const blockWeight = document.getElementById('block-weight');
 const blockColour = document.getElementById('block-colour');
+// Modal window
+const modal = document.getElementById('modal');
+const addModalShow = document.getElementById('show-add-modal');
+const modalClose = document.getElementById('close-modal');
+const addNewBlock = document.getElementById('add-block-btn');
+const updateBlockBtn = document.getElementById('update-block-btn');
+const deleteBlockBtn = document.getElementById('delete-block-btn');
 
-// Items
 let updatedOnLoad = false;
 
 // Initialize Arrays
@@ -34,6 +34,7 @@ function getSavedColumns() {
   else {
     // Create default blocks
     const toDo = {
+      // id: 0,
       name: 'To do',
       numOfActions: '10',
       weighting: '10',
@@ -41,6 +42,7 @@ function getSavedColumns() {
       actionItems: ['Release the course', 'Sit back and relax']
     };
     const inProgress = {
+      // id: 1,
       name: 'In-progress',
       numOfActions: '10',
       weighting: '10',
@@ -48,6 +50,7 @@ function getSavedColumns() {
       actionItems: ['Work on projects', 'Listen to music']
     };
     const completed = {
+      // id: 2,
       name: 'Completed',
       numOfActions: '10',
       weighting: '10',
@@ -69,17 +72,6 @@ function saveBlock(name, data) {
   localStorage.setItem(`${name}`, JSON.stringify(data));
 }
 
-// Set localStorage Arrays
-// function updateSavedColumns() {
-//   const blockNames = Array.from(listArrays).map(block => block.name);
-//   console.log(blockNames)
-//   const arrayNames = ['backlog', 'progress','complete', 'onHold'];
-
-//   arrayNames.forEach((arrayName, index) => {
-//     localStorage.setItem(`${arrayName}Items`, JSON.stringify(listArrays[index]));
-//   });
-// }
-
 // Filter Arrays to remove empty items
 function filterArray(array) {
   const filteredArray = array.filter(item => item !== null);
@@ -87,9 +79,43 @@ function filterArray(array) {
 }
 
 // Show Modal, Focus on Input
-function showModal() {
+function showModal(text) {
+  let title = document.getElementById('modal-header-text');
+  title.textContent = text;
+  
 	modal.classList.add('show-modal');
   blockName.focus();
+}
+
+// Clear Modal Input when hidden
+function resetModal() {
+  blockForm.reset();
+  updateBlockBtn.value = '0';
+  deleteBlockBtn.value = '0';
+}
+
+// Update Block Modal 
+function updateModal(blockData, index) {
+  const { name, numOfActions, weighting, colour} = blockData;
+  let modName = document.getElementById('block-name');
+  let modActions = document.getElementById('min-num-actions');
+  let modWeight = document.getElementById('block-weight');
+  let modColour = document.getElementById('block-colour');
+
+  // Display block attributes
+  modName.value = name;
+  modActions.value = numOfActions;
+  modWeight.value = weighting;
+  modColour.value = colour;
+  updateBlockBtn.value = index;
+  deleteBlockBtn.value = index;
+
+  // Change submit button
+  addNewBlock.style.display = 'none';
+  updateBlockBtn.style.display = 'inline-block';
+  deleteBlockBtn.style.display = 'inline-block';
+
+  showModal('Update Block');
 }
 
 // Validate new column
@@ -127,6 +153,7 @@ function storeBlocks(e) {
   }
 
   const actionData = {
+    // id: blockObjects.length-1,
     name: nameVal,
     numOfActions: minActionsNum,
     weighting: weight,
@@ -143,40 +170,67 @@ function storeBlocks(e) {
   blockName.focus();
 }
 
-function deleteBlock(blockName) {
-  // Find block
-  blockObjects.forEach((block, index) => {
-    if (block.name === blockName) {
-      blockObjects.splice(index, 1);
-    }
-  });
-  // Update local storage
+function updateBlock(e, blockIndex) {
+  e.preventDefault()
+  if (!confirm(`Update this block?`)) {
+    return
+  }
+  let modName = document.getElementById('block-name');
+  let modActions = document.getElementById('min-num-actions');
+  let modWeight = document.getElementById('block-weight');
+  let modColour = document.getElementById('block-colour');
+
+  // Update object values 
+  blockObjects[blockIndex].name = modName.value;
+  blockObjects[blockIndex].numOfActions = modActions.value;
+  blockObjects[blockIndex].weight = modWeight.value;
+  blockObjects[blockIndex].colour = modColour.value;
+
+  // Store in local storage
   saveBlock('blocks', blockObjects);
+
+  updateDOM();
+}
+
+// Delete a specified block from storage
+function deleteBlock(e, blockIndex) {
+  e.preventDefault();
+  if (!confirm(`Remove this block?`)) {
+      return
+  }
+  // Find block
+  blockObjects.splice(blockIndex, 1);
+      
+  // Store in local storage
+  saveBlock('blocks', blockObjects);
+  
+  resetModal();
+  modal.classList.remove('show-modal');
   updateDOM();
 }
 
 // Create Columns to store action items
 function createColumn() {
-  // Reset content
-  dragContainer.textContent = '';
 
-  blockObjects.forEach((actionData, index) => {
-    const { name, numOfActions, weighting, colour} = actionData;
+  blockObjects.forEach((blockData, index) => {
+    const { name, numOfActions, weighting, colour} = blockData;
     // Create column parts
     const actionBlock = document.createElement('li');
     const titleSpan = document.createElement('span');
     const titleText = document.createElement('h1');
+    const blockEdit = document.createElement('i');
+    const blockOptions = document.createElement('div');
     const closeBlock = document.createElement('i');
     
     const contentGroup = document.createElement('div');
     const actionList = document.createElement('ul');
 
     const buttonGroup = document.createElement('div');
-    const colAddBtn = document.createElement('div');
-    const colAddText = document.createElement('span');
+    const blockAddBtn = document.createElement('div');
+    const blockAddText = document.createElement('span');
 
-    const colSaveBtn = document.createElement('div');
-    const colSaveText = document.createElement('span');
+    const blockSaveBtn = document.createElement('div');
+    const blockSaveText = document.createElement('span');
     const textContainer = document.createElement('div');
     const textData = document.createElement('div');
 
@@ -185,20 +239,16 @@ function createColumn() {
     actionBlock.classList.add('action-block');
     actionBlock.setAttribute('min-num-actions', numOfActions);
     actionBlock.setAttribute('column-weight', weighting)
+
     titleSpan.classList.add('header');
-    closeBlock.setAttribute('id', 'close-block');
-    closeBlock.classList.add('fas');
-    closeBlock.classList.add('fa-times');
-    closeBlock.addEventListener('click', () => {
-      if (!confirm(`Did you want to remove "${name}" block?`)) {
-        return
-      }
-      const blockName = name;
-      deleteBlock(blockName);
+    blockEdit.classList.add('far');
+    blockEdit.classList.add('fa-edit');
+    blockEdit.addEventListener('click', () => {
+      updateModal(blockData, index);
     });
     titleText.textContent = name;
     titleSpan.appendChild(titleText);
-    titleSpan.appendChild(closeBlock);
+    titleSpan.appendChild(blockEdit);
     // Change colour
     changeBlockColour(titleSpan, colour);
 
@@ -210,22 +260,22 @@ function createColumn() {
     contentGroup.appendChild(actionList);
 
     buttonGroup.classList.add('add-btn-group');
-    colAddBtn.classList.add('add-btn');
-    colAddBtn.addEventListener('click', () => {
+    blockAddBtn.classList.add('add-btn');
+    blockAddBtn.addEventListener('click', () => {
       showInputBox(index);
     });
-    colAddText.classList.add('plus-sign');
-    colAddText.textContent = '+';
-    colSaveBtn.classList.add('add-btn');
-    colSaveBtn.classList.add('solid');
-    colSaveBtn.addEventListener('click', () => {
+    blockAddText.classList.add('plus-sign');
+    blockAddText.textContent = '+';
+    blockSaveBtn.classList.add('add-btn');
+    blockSaveBtn.classList.add('solid');
+    blockSaveBtn.addEventListener('click', () => {
       hideInputBox(index);
     })
-    colSaveText.textContent = 'Save Item';
-    colAddBtn.appendChild(colAddText);
-    colSaveBtn.appendChild(colSaveText);
-    buttonGroup.appendChild(colAddBtn);
-    buttonGroup.appendChild(colSaveBtn);
+    blockSaveText.textContent = 'Save Item';
+    blockAddBtn.appendChild(blockAddText);
+    blockSaveBtn.appendChild(blockSaveText);
+    buttonGroup.appendChild(blockAddBtn);
+    buttonGroup.appendChild(blockSaveBtn);
 
     textContainer.classList.add('add-container');
     textData.classList.add('add-item');
@@ -252,9 +302,8 @@ function createItemEl(actionItems, blockInd) {
     listEl.draggable = true;
     listEl.setAttribute('ondragstart', 'drag(event)');
 
-    // Temporary solution to Firefox edit or dragging issue
-    listEl.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
+    // Double click to edit item
+    listEl.addEventListener('dblclick', () => {
       listEl.contentEditable = true
     });
     
@@ -272,29 +321,19 @@ function updateDOM() {
     getSavedColumns();
   }
 
+  console.log(blockObjects);
+  // Reset content
+  dragContainer.textContent = '';
   createColumn();
   blockObjects.forEach((block, blockIndex) => {
     let filteredActions = filterArray(block.actionItems);
     createItemEl(filteredActions, blockIndex);
   });
+  console.log(blockObjects);
   
   // Run getSavedColumns only once, Update Local Storage
   updatedOnLoad = true;
 }
-
-// Update column counters
-// function updateColumnCounter() {
-//   let counters = document.querySelectorAll('.col-counter');
-//   counters.forEach((i, index) => {
-//     if (blockObjects[index].length > 0) {
-//       i.style.display = 'flex';
-//       i.textContent = `${blockObjects[index].length}`;
-//     }
-//     else {
-//       i.style.display = 'none';
-//     }
-//   });
-// }
 
 // Update Item - Delete if necessary, or update Array value
 function updateItem(blockInd, itemInd) {
@@ -401,11 +440,28 @@ function drop(e) {
 
 
 // Event Listeners
-blockForm.addEventListener('submit', storeBlocks);
-// Modal Event Listeners
-modalShow.addEventListener('click', showModal);
+addNewBlock.addEventListener('click', storeBlocks);
+
+updateBlockBtn.addEventListener('click', (e) => {
+  let indVal = updateBlockBtn.value;
+  updateBlock(e, indVal);
+});
+deleteBlockBtn.addEventListener('click', (e) => {
+  let indVal = deleteBlockBtn.value;
+  deleteBlock(e, indVal);
+});
+
+addModalShow.addEventListener('click', () => {
+  updateBlockBtn.style.display = 'none';
+  deleteBlockBtn.style.display = 'none';
+  addNewBlock.style.display = 'block';
+  resetModal();
+  showModal('Add New Block');
+});
+
 modalClose.addEventListener('click', () => modal.classList.remove('show-modal'));
 window.addEventListener('click', (e) => (e.target === modal ? modal.classList.remove('show-modal') : false));
+
 // On Load
 updateDOM();
 
