@@ -1,3 +1,6 @@
+// Templates
+const templates = document.getElementById('templates');
+const templateList = document.getElementById('template-list');
 // Blocks
 const dragContainer = document.getElementById('drag-container');
 const blockForm = document.getElementById('block-form');
@@ -5,14 +8,16 @@ const blockName = document.getElementById('block-name');
 const minActions = document.getElementById('min-num-actions');
 const blockWeight = document.getElementById('block-weight');
 const blockColour = document.getElementById('block-colour');
-// Modal window
+// Modal & Block Items
 const modal = document.getElementById('modal');
 const addModalShow = document.getElementById('show-add-modal');
 const modalClose = document.getElementById('close-modal');
 const addNewBlock = document.getElementById('add-block-btn');
 const updateBlockBtn = document.getElementById('update-block-btn');
 const deleteBlockBtn = document.getElementById('delete-block-btn');
-
+const saveWorkspace = document.getElementById('save-workspace-btn');
+// On load variables
+let templatesShowing = true;
 let updatedOnLoad = false;
 
 // Initialize Arrays
@@ -24,6 +29,127 @@ let draggedItem;
 let dragging = false;
 let currentColumn;
 
+// Templates
+function showTemplates() {
+  templatesShowing = false;
+  templates.classList.add('show-template');
+}
+
+function buildClassicTodo() {
+  // Reset Block objects array
+  blockObjects = [];
+  // Create Block data
+  const toDo = {
+    name: 'To do',
+    numOfActions: '10',
+    weighting: '10',
+    colour: '#292f36',
+    actionItems: ['Release the course', 'Sit back and relax']
+  };
+  const inProgress = {
+    name: 'In-progress',
+    numOfActions: '10',
+    weighting: '10',
+    colour: '#ffe66d',
+    actionItems: ['Work on projects', 'Listen to music']
+  };
+  const completed = {
+    name: 'Completed',
+    numOfActions: '10',
+    weighting: '10',
+    colour: '#44cf6c',
+    actionItems: ['Being cool', 'Getting stuff done']
+  };
+  // Push into main array
+  blockObjects.push(toDo);
+  blockObjects.push(inProgress);
+  blockObjects.push(completed);
+}
+
+function buildDeepWork() {
+  // Reset Block objects array
+  blockObjects = [];
+  // Create default blocks
+  const deepWork = {
+    name: 'Deep Work',
+    numOfActions: '10',
+    weighting: '10',
+    colour: '#1c5d99',
+    actionItems: ['Release the course', 'Sit back and relax']
+  };
+  const shallowWork = {
+    name: 'Shallow Work',
+    numOfActions: '10',
+    weighting: '10',
+    colour: '#bbcde5',
+    actionItems: ['Work on projects', 'Listen to music']
+  };
+  // Push into Blocks objects array
+  blockObjects.push(deepWork);
+  blockObjects.push(shallowWork);
+}
+
+function buildEisenhower() {
+    // Reset Block objects array
+    blockObjects = [];
+    // Create Block data
+    const urgent = {
+      name: 'Urgent',
+      numOfActions: '10',
+      weighting: '10',
+      colour: '#1d3557',
+      actionItems: ['Release the course', 'Sit back and relax']
+    };
+    const important = {
+      name: 'Important',
+      numOfActions: '10',
+      weighting: '10',
+      colour: '#a8dadc',
+      actionItems: ['Work on projects', 'Listen to music']
+    };
+    const urgentImportant = {
+      name: 'Urgent & Important',
+      numOfActions: '10',
+      weighting: '10',
+      colour: '#f1faee',
+      actionItems: ['Being cool', 'Getting stuff done']
+    };
+    const delegated = {
+      name: 'Delegated',
+      numOfActions: '10',
+      weighting: '10',
+      colour: '#e63946',
+      actionItems: ['Being cool', 'Getting stuff done']
+    };
+    // Push into main array
+    blockObjects.push(urgent);
+    blockObjects.push(important);
+    blockObjects.push(urgentImportant);
+    blockObjects.push(delegated);
+}
+
+function buildWorkspace(e) {
+  templates.classList.remove('show-template');
+  dragContainer.classList.add('drag-container');
+
+  if (e.target.parentNode.id === 'classic-todo') {
+    buildClassicTodo();
+  }
+  else if (e.target.parentNode.id === 'deep-work') {
+    buildDeepWork();
+  }
+  else if (e.target.parentNode.id === 'eisenhower-matrix') {
+    buildEisenhower();
+  }
+  else if (e.target.parentNode.id === 'saved-workspace') {
+    getSavedBlocks();
+  }
+  else {
+    return
+  }
+  // Build DOM elements
+  updateDOM();
+}
 
 // Show Modal, Focus on Input
 function showModal(text) {
@@ -94,42 +220,11 @@ function changeBlockColour(block, color) {
 }
 
 // Get Arrays from localStorage if available, set default values if not
-function getSavedColumns() {
-  if (localStorage.getItem('blocks') && !localStorage.getItem('blocks').length === 0) {
-    blockObjects = JSON.parse(localStorage.blocks);
+function getSavedBlocks() {
+  if (!localStorage.getItem('savedWorkspace') && localStorage.getItem('savedWorkspace').length === 0) {
+    return
   }
-  else {
-    // Create default blocks
-    const toDo = {
-      // id: 0,
-      name: 'To do',
-      numOfActions: '10',
-      weighting: '10',
-      colour: '#292f36',
-      actionItems: ['Release the course', 'Sit back and relax']
-    };
-    const inProgress = {
-      // id: 1,
-      name: 'In-progress',
-      numOfActions: '10',
-      weighting: '10',
-      colour: '#ffe66d',
-      actionItems: ['Work on projects', 'Listen to music']
-    };
-    const completed = {
-      // id: 2,
-      name: 'Completed',
-      numOfActions: '10',
-      weighting: '10',
-      colour: '#44cf6c',
-      actionItems: ['Being cool', 'Getting stuff done']
-    };
-    // Push into main array
-    blockObjects.push(toDo);
-    blockObjects.push(inProgress);
-    blockObjects.push(completed);
-  }
-  
+  blockObjects = JSON.parse(localStorage.savedWorkspace);
 }
 
 // Save and store blocks
@@ -145,7 +240,6 @@ function storeBlocks(e) {
   }
 
   const actionData = {
-    // id: blockObjects.length-1,
     name: nameVal,
     numOfActions: minActionsNum,
     weighting: weight,
@@ -154,16 +248,13 @@ function storeBlocks(e) {
   };
   blockObjects.push(actionData);
 
-  // Store in local storage
-  saveBlock('blocks', blockObjects);
-
   updateDOM();
   blockForm.reset();
   blockName.focus();
 }
 
 // Save data to local storage
-function saveBlock(name, data) {
+function saveBlocks(name, data) {
   if (!name && !data) {
     return false
   }
@@ -187,9 +278,6 @@ function updateBlock(e, blockIndex) {
   blockObjects[blockIndex].weight = modWeight.value;
   blockObjects[blockIndex].colour = modColour.value;
 
-  // Store in local storage
-  saveBlock('blocks', blockObjects);
-
   updateDOM();
 }
 
@@ -201,12 +289,10 @@ function deleteBlock(e, blockIndex) {
   }
   // Find block
   blockObjects.splice(blockIndex, 1);
-      
-  // Store in local storage
-  saveBlock('blocks', blockObjects);
-  
+  // Disable modal
   resetModal();
   modal.classList.remove('show-modal');
+
   updateDOM();
 }
 
@@ -332,9 +418,9 @@ function createItemEl(actionItems, blockInd) {
 // Update Columns in DOM - Reset HTML, Filter Array, Update localStorage
 function updateDOM() {
   // Check localStorage once
-  if (!updatedOnLoad) {
-    getSavedColumns();
-  }
+  // if (!updatedOnLoad) {
+  //   getSavedColumns();
+  // }
 
   // Reset content
   dragContainer.textContent = '';
@@ -453,6 +539,14 @@ function drop(e) {
 
 
 // Event Listeners
+saveWorkspace.addEventListener('click', () => {
+  if (!confirm('Do you want to save changes to local storage?')) {
+    return
+  }
+  saveBlocks('savedWorkspace', blockObjects);
+  // Show toast message?
+});
+
 addNewBlock.addEventListener('click', storeBlocks);
 
 updateBlockBtn.addEventListener('click', (e) => {
@@ -475,6 +569,11 @@ addModalShow.addEventListener('click', () => {
 modalClose.addEventListener('click', () => modal.classList.remove('show-modal'));
 window.addEventListener('click', (e) => (e.target === modal ? modal.classList.remove('show-modal') : false));
 
-// On Load
-updateDOM();
+templateList.addEventListener('click', (e) => {
+  buildWorkspace(e);
+});
 
+// On Load
+if (templatesShowing) {
+  showTemplates()
+}

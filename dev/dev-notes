@@ -16,8 +16,14 @@ Notes:
 7) Ability to drag and drop items [A]
 8) Ability to label action items (e.g. Eisenhower matrix) /
 9) Ability to edit a block [A]
-10) Template buttons (Eisenhower or Deep or Shallow)
+10) Template buttons (Eisenhower or Deep or Shallow) [B]
 11) Ability to remove unused blocks [A]
 12) Store blocks in local storage [A]
-13) Save a snapshot of the data
+13) Save a snapshot of the data [A]
 14) Redesign CSS [B]
+
+Additional notes:
+1) Add toast notification when saving
+2) Replace 'Templates' with the App title and animate 
+it to go up when the user selects an option
+3) Add highlight button to indicate an item is 'high-priority'
