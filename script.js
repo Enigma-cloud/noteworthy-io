@@ -17,7 +17,6 @@ let updatedOnLoad = false;
 
 // Initialize Arrays
 let blockList;
-let blockArrays;
 let blockObjects = [];
 
 // Drag Functionality
@@ -25,58 +24,6 @@ let draggedItem;
 let dragging = false;
 let currentColumn;
 
-
-// Get Arrays from localStorage if available, set default values if not
-function getSavedColumns() {
-  if (localStorage.getItem('blocks') && !localStorage.getItem('blocks').length === 0) {
-    blockObjects = JSON.parse(localStorage.blocks);
-  }
-  else {
-    // Create default blocks
-    const toDo = {
-      // id: 0,
-      name: 'To do',
-      numOfActions: '10',
-      weighting: '10',
-      colour: '#292f36',
-      actionItems: ['Release the course', 'Sit back and relax']
-    };
-    const inProgress = {
-      // id: 1,
-      name: 'In-progress',
-      numOfActions: '10',
-      weighting: '10',
-      colour: '#ffe66d',
-      actionItems: ['Work on projects', 'Listen to music']
-    };
-    const completed = {
-      // id: 2,
-      name: 'Completed',
-      numOfActions: '10',
-      weighting: '10',
-      colour: '#44cf6c',
-      actionItems: ['Being cool', 'Getting stuff done']
-    };
-    // Push into main array
-    blockObjects.push(toDo);
-    blockObjects.push(inProgress);
-    blockObjects.push(completed);
-  }
-  
-}
-
-function saveBlock(name, data) {
-  if (!name && !data) {
-    return false
-  }
-  localStorage.setItem(`${name}`, JSON.stringify(data));
-}
-
-// Filter Arrays to remove empty items
-function filterArray(array) {
-  const filteredArray = array.filter(item => item !== null);
-  return filteredArray;
-}
 
 // Show Modal, Focus on Input
 function showModal(text) {
@@ -118,6 +65,12 @@ function updateModal(blockData, index) {
   showModal('Update Block');
 }
 
+// Filter Arrays to remove empty items
+function filterArray(array) {
+  const filteredArray = array.filter(item => item !== null);
+  return filteredArray;
+}
+
 // Validate new column
 function validateCol(nameValue, actionsValue, weightValue) {
   const actionsExpression = /^[1-9][0-9]?$|^100$/
@@ -138,6 +91,45 @@ function validateCol(nameValue, actionsValue, weightValue) {
 // Change block colour
 function changeBlockColour(block, color) {
   block.style.backgroundColor = color;
+}
+
+// Get Arrays from localStorage if available, set default values if not
+function getSavedColumns() {
+  if (localStorage.getItem('blocks') && !localStorage.getItem('blocks').length === 0) {
+    blockObjects = JSON.parse(localStorage.blocks);
+  }
+  else {
+    // Create default blocks
+    const toDo = {
+      // id: 0,
+      name: 'To do',
+      numOfActions: '10',
+      weighting: '10',
+      colour: '#292f36',
+      actionItems: ['Release the course', 'Sit back and relax']
+    };
+    const inProgress = {
+      // id: 1,
+      name: 'In-progress',
+      numOfActions: '10',
+      weighting: '10',
+      colour: '#ffe66d',
+      actionItems: ['Work on projects', 'Listen to music']
+    };
+    const completed = {
+      // id: 2,
+      name: 'Completed',
+      numOfActions: '10',
+      weighting: '10',
+      colour: '#44cf6c',
+      actionItems: ['Being cool', 'Getting stuff done']
+    };
+    // Push into main array
+    blockObjects.push(toDo);
+    blockObjects.push(inProgress);
+    blockObjects.push(completed);
+  }
+  
 }
 
 // Save and store blocks
@@ -170,6 +162,15 @@ function storeBlocks(e) {
   blockName.focus();
 }
 
+// Save data to local storage
+function saveBlock(name, data) {
+  if (!name && !data) {
+    return false
+  }
+  localStorage.setItem(`${name}`, JSON.stringify(data));
+}
+
+// Update Block attributes
 function updateBlock(e, blockIndex) {
   e.preventDefault()
   if (!confirm(`Update this block?`)) {
@@ -211,16 +212,13 @@ function deleteBlock(e, blockIndex) {
 
 // Create Columns to store action items
 function createColumn() {
-
   blockObjects.forEach((blockData, index) => {
     const { name, numOfActions, weighting, colour} = blockData;
-    // Create column parts
+    // Create Block Parts
     const actionBlock = document.createElement('li');
     const titleSpan = document.createElement('span');
     const titleText = document.createElement('h1');
     const blockEdit = document.createElement('i');
-    const blockOptions = document.createElement('div');
-    const closeBlock = document.createElement('i');
     
     const contentGroup = document.createElement('div');
     const actionList = document.createElement('ul');
@@ -234,12 +232,12 @@ function createColumn() {
     const textContainer = document.createElement('div');
     const textData = document.createElement('div');
 
-    // Add styling & attributes
+    // Block
     actionBlock.classList.add('drag-block');
     actionBlock.classList.add('action-block');
     actionBlock.setAttribute('min-num-actions', numOfActions);
     actionBlock.setAttribute('column-weight', weighting)
-
+    // Header
     titleSpan.classList.add('header');
     blockEdit.classList.add('far');
     blockEdit.classList.add('fa-edit');
@@ -249,16 +247,15 @@ function createColumn() {
     titleText.textContent = name;
     titleSpan.appendChild(titleText);
     titleSpan.appendChild(blockEdit);
-    // Change colour
     changeBlockColour(titleSpan, colour);
-
+    // Action List - Items
     contentGroup.classList.add('custom-scroll');
     actionList.classList.add('drag-item-list');
     actionList.setAttribute('ondrop', 'drop(event)');
     actionList.setAttribute('ondragover', 'allowDrop(event)');
     actionList.setAttribute('ondragenter', `dragEnter(${index})`);
     contentGroup.appendChild(actionList);
-
+    // List Item - Buttons 
     buttonGroup.classList.add('add-btn-group');
     blockAddBtn.classList.add('add-btn');
     blockAddBtn.addEventListener('click', () => {
@@ -276,13 +273,12 @@ function createColumn() {
     blockSaveBtn.appendChild(blockSaveText);
     buttonGroup.appendChild(blockAddBtn);
     buttonGroup.appendChild(blockSaveBtn);
-
+    // List Item - Inputs
     textContainer.classList.add('add-container');
     textData.classList.add('add-item');
     textData.contentEditable = true;
     textContainer.appendChild(textData);
-
-    // Assemble column
+    // Assemble Block
     actionBlock.appendChild(titleSpan);
     actionBlock.appendChild(contentGroup);
     actionBlock.appendChild(buttonGroup);
@@ -294,14 +290,32 @@ function createColumn() {
 // Create DOM Elements for each action item
 function createItemEl(actionItems, blockInd) {
   blockList = document.querySelectorAll('.drag-item-list');
-  // List Item
   actionItems.forEach((text, itemInd) => {
     const listEl = document.createElement('li');
+    const iconEl = document.createElement('i');
+    // Item
     listEl.classList.add('drag-item');
     listEl.textContent = text;
     listEl.draggable = true;
     listEl.setAttribute('ondragstart', 'drag(event)');
+    // Cross-through
+    iconEl.classList.add('fas');
+    iconEl.classList.add('fa-slash');
+    iconEl.setAttribute('crossed', false)
+    iconEl.addEventListener('click', () => {
+      if (iconEl.crossed) {
+        iconEl.classList.replace('fa-check', 'fa-slash');
+        iconEl.parentNode.style.textDecoration = 'none';
 
+        iconEl.crossed = false;
+      }
+      else {
+        iconEl.classList.replace('fa-slash', 'fa-check');
+        iconEl.parentNode.style.textDecoration = 'line-through';
+        iconEl.crossed = true;
+      }
+    })
+    
     // Double click to edit item
     listEl.addEventListener('dblclick', () => {
       listEl.contentEditable = true
@@ -310,6 +324,7 @@ function createItemEl(actionItems, blockInd) {
     listEl.id = itemInd;
     listEl.setAttribute('onfocusout', `updateItem(${blockInd}, ${itemInd})`);
     // Append
+    listEl.appendChild(iconEl);
     blockList[blockInd].appendChild(listEl);
   })
 }
@@ -321,7 +336,6 @@ function updateDOM() {
     getSavedColumns();
   }
 
-  console.log(blockObjects);
   // Reset content
   dragContainer.textContent = '';
   createColumn();
@@ -329,7 +343,6 @@ function updateDOM() {
     let filteredActions = filterArray(block.actionItems);
     createItemEl(filteredActions, blockIndex);
   });
-  console.log(blockObjects);
   
   // Run getSavedColumns only once, Update Local Storage
   updatedOnLoad = true;
