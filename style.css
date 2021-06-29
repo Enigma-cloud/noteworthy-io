@@ -40,11 +40,65 @@ ul {
   padding: 0;
 }
 
+.content-container {
+  display: grid; 
+  grid-template-columns: 1fr; 
+  grid-template-rows: 0.5fr 1fr; 
+  gap: 0px 0px; 
+  grid-template-areas: 
+    "."
+    "."; 
+}
+
 .drag-container {
   display: flex;
   flex: row;
   flex-wrap: wrap;
 }
+
+
+/* Templates */
+.template-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.template-list {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+}
+
+.template-item {
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+  width: 20%;
+}
+
+.template-list p {
+  margin: 5px;
+  padding: 0 5px 0 5px;
+  color: var(--dark-1);
+}
+
+.template-icon {
+  display: flex;
+  justify-content: center;
+  background-color: #292F36;
+  filter: brightness(90%);
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 5rem;
+}
+
+.template-icon:hover {
+  filter: brightness(110%);
+}
+
 
 
 /* Floating add button */
