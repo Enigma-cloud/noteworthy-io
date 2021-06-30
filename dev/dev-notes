@@ -30,3 +30,4 @@ it to go up when the user selects an option
 c) Add highlight button to indicate an item is 'high-priority'
 d) Redesign floating action buttons (use button wrapper?)
 e) Swap hover brightness -> lower brightness on hover?
+f) allow user to set name of workspace (to be chosen when user wants to continue from what they've done)

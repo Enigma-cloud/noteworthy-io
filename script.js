@@ -582,6 +582,9 @@ window.addEventListener('click', (e) => (e.target === modal ? modal.classList.re
 templateList.addEventListener('click', (e) => {
   buildWorkspace(e);
 });
+window.onbeforeunload = function(){
+  return 'Are you sure you want to leave?';
+};
 
 // On Load
 if (templatesShowing) {
