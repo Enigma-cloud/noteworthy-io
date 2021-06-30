@@ -5,6 +5,7 @@
 // Title
 const mainTitle = document.getElementById('main-title');
 // Templates
+const templatesModalBtn = document.getElementById('templates-modal');
 const templates = document.getElementById('templates');
 const templateList = document.getElementById('template-list');
 // Blocks
@@ -39,8 +40,17 @@ let currentColumn;
 
 // Templates
 function showTemplates() {
-  templatesShowing = false;
-  templates.classList.add('show-template');
+  if (templates.classList.contains('show-template') && mainTitle.classList.contains('centered')) {
+    templates.classList.remove('show-template');
+    mainTitle.classList.remove('centered');
+    return
+  } 
+  else {
+    templates.classList.add('show-template');
+    mainTitle.classList.add('centered');
+    return
+  }
+  
 }
 
 function buildClassicTodo() {
@@ -137,10 +147,6 @@ function buildEisenhower() {
 }
 
 function buildWorkspace(e) {
-  templates.classList.remove('show-template');
-  dragContainer.classList.add('drag-container');
-  mainTitle.classList.remove('centered');
-  
   if (e.target.parentNode.id === 'classic-todo') {
     buildClassicTodo();
   }
@@ -154,9 +160,15 @@ function buildWorkspace(e) {
     getSavedBlocks();
   }
   else {
-    return
+    if (dragList.textContent !== '' && confirm('Do you want to erase the current workspace and create a new one?')) {
+        dragList.textContent = '';
+        blockObjects = [];
+    }
   }
   // Build DOM elements
+  templates.classList.remove('show-template');
+  dragContainer.classList.add('drag-container');
+  mainTitle.classList.remove('centered');
   updateDOM();
 }
 
@@ -557,6 +569,7 @@ deleteBlockBtn.addEventListener('click', (e) => {
   let indVal = deleteBlockBtn.value;
   deleteBlock(e, indVal);
 });
+templatesModalBtn.addEventListener('click', showTemplates);
 addModalShow.addEventListener('click', () => {
   updateBlockBtn.style.display = 'none';
   deleteBlockBtn.style.display = 'none';
@@ -572,5 +585,5 @@ templateList.addEventListener('click', (e) => {
 
 // On Load
 if (templatesShowing) {
-  showTemplates()
+  showTemplates();
 }
