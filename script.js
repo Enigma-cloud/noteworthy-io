@@ -1,29 +1,37 @@
+/**
+ * @author Enigma-cloud
+ */
+/** DOM Elements */
+// Title
+const mainTitle = document.getElementById('main-title');
 // Templates
 const templates = document.getElementById('templates');
 const templateList = document.getElementById('template-list');
 // Blocks
 const dragContainer = document.getElementById('drag-container');
+const dragList = document.getElementById('drag-list')
 const blockForm = document.getElementById('block-form');
 const blockName = document.getElementById('block-name');
 const minActions = document.getElementById('min-num-actions');
 const blockWeight = document.getElementById('block-weight');
 const blockColour = document.getElementById('block-colour');
-// Modal & Block Items
+const updateBlockBtn = document.getElementById('update-block-btn');
+const deleteBlockBtn = document.getElementById('delete-block-btn');
+// Modal
 const modal = document.getElementById('modal');
 const addModalShow = document.getElementById('show-add-modal');
 const modalClose = document.getElementById('close-modal');
 const addNewBlock = document.getElementById('add-block-btn');
-const updateBlockBtn = document.getElementById('update-block-btn');
-const deleteBlockBtn = document.getElementById('delete-block-btn');
 const saveWorkspace = document.getElementById('save-workspace-btn');
-// On load variables
+
+
+/** Global variables*/
+// On load
 let templatesShowing = true;
 let updatedOnLoad = false;
-
 // Initialize Arrays
 let blockList;
 let blockObjects = [];
-
 // Drag Functionality
 let draggedItem;
 let dragging = false;
@@ -131,7 +139,8 @@ function buildEisenhower() {
 function buildWorkspace(e) {
   templates.classList.remove('show-template');
   dragContainer.classList.add('drag-container');
-
+  mainTitle.classList.remove('centered');
+  
   if (e.target.parentNode.id === 'classic-todo') {
     buildClassicTodo();
   }
@@ -369,7 +378,7 @@ function createColumn() {
     actionBlock.appendChild(contentGroup);
     actionBlock.appendChild(buttonGroup);
     actionBlock.appendChild(textContainer);
-    dragContainer.appendChild(actionBlock);
+    dragList.appendChild(actionBlock);
   });
 }
 
@@ -417,21 +426,25 @@ function createItemEl(actionItems, blockInd) {
 
 // Update Columns in DOM - Reset HTML, Filter Array, Update localStorage
 function updateDOM() {
-  // Check localStorage once
-  // if (!updatedOnLoad) {
-  //   getSavedColumns();
-  // }
-
   // Reset content
-  dragContainer.textContent = '';
+  dragList.textContent = '';
+  // Build blocks
   createColumn();
   blockObjects.forEach((block, blockIndex) => {
     let filteredActions = filterArray(block.actionItems);
     createItemEl(filteredActions, blockIndex);
   });
-  
-  // Run getSavedColumns only once, Update Local Storage
-  updatedOnLoad = true;
+}
+
+// Update arrays after Drag & Drop change
+function rebuildArrays() {
+  // Reset arrays and repopulate with data
+  blockList = document.querySelectorAll('.drag-item-list');
+  for (i = 0; i < blockList.length; i++) {
+    blockObjects[i].actionItems = Array.from(blockList[i].children).map(item => item.textContent);
+  }
+  // Update DOM
+  updateDOM();
 }
 
 // Update Item - Delete if necessary, or update Array value
@@ -451,11 +464,11 @@ function updateItem(blockInd, itemInd) {
   }
 }
 
-// Add new item to column list -> Reset textbox
-function addToColumn(column) {
+// Add new item to block list -> Reset textbox
+function addToBlock(block) {
   const addItems = document.querySelectorAll('.add-item');
-  const selectedArray = blockObjects[column].actionItems;
-  const itemText = addItems[column].textContent;
+  const selectedArray = blockObjects[block].actionItems;
+  const itemText = addItems[block].textContent;
 
   if (!itemText) {
     // Close if input box empty
@@ -463,43 +476,33 @@ function addToColumn(column) {
   }
   
   selectedArray.push(itemText);
-  addItems[column].textContent = "";
+  addItems[block].textContent = "";
   updateDOM();
 }
 
 // Show Add Item input box
-function showInputBox(column) {
+function showInputBox(block) {
   let addBtns = document.querySelectorAll('.add-btn:not(.solid)');
   let saveItemBtns = document.querySelectorAll('.solid');
   let addItemContainers = document.querySelectorAll('.add-container');
 
-  addBtns[column].style.visibility = 'hidden';
-  saveItemBtns[column].style.display = 'flex';
-  addItemContainers[column].style.display = 'flex';
+  addBtns[block].style.visibility = 'hidden';
+  saveItemBtns[block].style.display = 'flex';
+  addItemContainers[block].style.display = 'flex';
 }
 
 // Hide Add Item input box
-function hideInputBox(column) {
+function hideInputBox(block) {
   let addBtns = document.querySelectorAll('.add-btn:not(.solid)');
   let saveItemBtns = document.querySelectorAll('.solid');
   let addItemContainers = document.querySelectorAll('.add-container');
 
-  addBtns[column].style.visibility = 'visible';
-  saveItemBtns[column].style.display = 'none';
-  addItemContainers[column].style.display = 'none';
-  addToColumn(column);
+  addBtns[block].style.visibility = 'visible';
+  saveItemBtns[block].style.display = 'none';
+  addItemContainers[block].style.display = 'none';
+  addToBlock(block);
 }
 
-// Update arrays after Drag & Drop change
-function rebuildArrays() {
-  // Reset arrays and repopulate with data
-  blockList = document.querySelectorAll('.drag-item-list');
-  for (i = 0; i < blockList.length; i++) {
-    blockObjects[i].actionItems = Array.from(blockList[i].children).map(item => item.textContent);
-  }
-  // Update DOM
-  updateDOM();
-}
 
 /** Drag & Drop Functionality */
 // When Item Starts Dragging
@@ -509,10 +512,10 @@ function drag(e) {
 }
 
 // When a draggable item enters a column (drop area)
-function dragEnter(column) {
+function dragEnter(block) {
   blockList = document.querySelectorAll('.drag-item-list');
-  blockList[column].classList.add('over');
-  currentColumn = column;
+  blockList[block].classList.add('over');
+  currentColumn = block;
 }
 
 // Allow items to be dragged into columns
@@ -533,12 +536,11 @@ function drop(e) {
   parent.appendChild(draggedItem);
   // Dragging complete
   dragging = false;
-  // Update to reflect change in the columns
   rebuildArrays();
 }
 
 
-// Event Listeners
+/** Event Listeners */
 saveWorkspace.addEventListener('click', () => {
   if (!confirm('Do you want to save changes to local storage?')) {
     return
@@ -546,9 +548,7 @@ saveWorkspace.addEventListener('click', () => {
   saveBlocks('savedWorkspace', blockObjects);
   // Show toast message?
 });
-
 addNewBlock.addEventListener('click', storeBlocks);
-
 updateBlockBtn.addEventListener('click', (e) => {
   let indVal = updateBlockBtn.value;
   updateBlock(e, indVal);
@@ -557,7 +557,6 @@ deleteBlockBtn.addEventListener('click', (e) => {
   let indVal = deleteBlockBtn.value;
   deleteBlock(e, indVal);
 });
-
 addModalShow.addEventListener('click', () => {
   updateBlockBtn.style.display = 'none';
   deleteBlockBtn.style.display = 'none';
@@ -565,10 +564,8 @@ addModalShow.addEventListener('click', () => {
   resetModal();
   showModal('Add New Block');
 });
-
 modalClose.addEventListener('click', () => modal.classList.remove('show-modal'));
 window.addEventListener('click', (e) => (e.target === modal ? modal.classList.remove('show-modal') : false));
-
 templateList.addEventListener('click', (e) => {
   buildWorkspace(e);
 });

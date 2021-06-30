@@ -9,6 +9,7 @@ html {
   --yellow-1: #FFE66D;
   --green-1: #44CF6C;
   --red-1: #FF6B6B;
+  --transition-time: 1s;
   --add-block: 60px;
   --save-workspace: 60px;
 }
@@ -32,15 +33,27 @@ h1 {
   text-shadow: 2px 2px 5px black;
 }
 
-.main-title {
-  text-align: center;
-  font-size: 3rem;
+h3 {
+  margin: 0;
 }
 
 ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
+}
+
+.main-title {
+  transform: translate(0, 0);
+  transition: 0.75s ease-in;
+  text-align: center;
+  font-size: 3rem;
+  z-index: 3;
+}
+
+.main-title.centered {
+  transform: translate(0, 25vh);
+  transition: 0.75s ease-in;
 }
 
 .content-container {
@@ -54,9 +67,7 @@ ul {
 }
 
 .drag-container {
-  display: flex;
-  flex: row;
-  flex-wrap: wrap;
+  margin: 10px;
 }
 
 
@@ -83,6 +94,7 @@ ul {
   display: flex;
   justify-content: center;
   flex-direction: row;
+  animation: modalopen 1s;
 }
 
 .template-item {
@@ -107,7 +119,7 @@ ul {
   filter: brightness(90%);
   padding: 10px;
   border-radius: 10px;
-  font-size: 5rem;
+  font-size: 5em;
   
 }
 
@@ -191,17 +203,7 @@ ul {
   box-shadow:  0 0 10px rgba(0, 0, 0, 0.8);
   max-width: 95%;
   width: 500px;
-  animation: modalopen 1s;
-}
-
-@keyframes modalopen {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  animation: modalopen var(--transition-time);
 }
 
 .close-icon {
@@ -223,10 +225,6 @@ ul {
   background: var(--red-1);
   color: white;
   padding: 15px;
-}
-
-h3 {
-  margin: 0;
 }
 
 .modal-content {
@@ -252,14 +250,13 @@ h3 {
 .form-label {
   color: var(--primary-color);
   display: block;
-} */
+} 
 
-.drag-container {
-  margin: 20px;
-}
 
 .drag-list {
   display: flex;
+  flex: row;
+  flex-wrap: wrap;
   align-items: flex-start;
 }
 
@@ -459,7 +456,26 @@ h3 {
 /* Media Query: Laptop */
 @media screen and (max-width: 1800px) {
   .main-title {
-    font-size: 2rem;
+    font-size: 2.5rem;
+  }
+
+  .template-list {
+    font-size: 0.9rem;
+  }
+
+  .template-icon {
+    font-size: 4em;
+  }
+}
+
+/* Animations */
+@keyframes modalopen {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
   }
 }
 
@@ -468,9 +484,18 @@ h3 {
   body {
     overflow-y: auto;
   }
+
+  .main-title {
+    font-size: 1.9rem;
+  }
   
   .template-list {
     flex-wrap: wrap;
+    font-size: 0.7rem;
+  }
+
+  .template-icon {
+    font-size: 2em;
   }
 
   .drag-container {
@@ -478,7 +503,8 @@ h3 {
   }
 
   .drag-list {
-    display: block;
+    display: flex;
+    flex-wrap: column wrap;
   }
 
   .drag-block {
