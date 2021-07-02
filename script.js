@@ -399,6 +399,7 @@ function createItemEl(actionItems, blockInd) {
   blockList = document.querySelectorAll('.drag-item-list');
   actionItems.forEach((text, itemInd) => {
     const listEl = document.createElement('li');
+    const span = document.createElement('span');
     const iconEl = document.createElement('i');
     // Item
     listEl.classList.add('drag-item');
@@ -406,19 +407,19 @@ function createItemEl(actionItems, blockInd) {
     listEl.draggable = true;
     listEl.setAttribute('ondragstart', 'drag(event)');
     // Cross-through
+    span.classList.add('item-icon-container');
     iconEl.classList.add('fas');
-    iconEl.classList.add('fa-slash');
+    iconEl.classList.add('fa-times');
     iconEl.setAttribute('crossed', false)
     iconEl.addEventListener('click', () => {
       if (iconEl.crossed) {
-        iconEl.classList.replace('fa-check', 'fa-slash');
-        iconEl.parentNode.style.textDecoration = 'none';
-
+        iconEl.classList.replace('fa-check', 'fa-times');
+        iconEl.parentNode.parentNode.style.textDecoration = 'none';
         iconEl.crossed = false;
       }
       else {
-        iconEl.classList.replace('fa-slash', 'fa-check');
-        iconEl.parentNode.style.textDecoration = 'line-through';
+        iconEl.classList.replace('fa-times', 'fa-check');
+        iconEl.parentNode.parentNode.style.textDecoration = 'line-through';
         iconEl.crossed = true;
       }
     })
@@ -431,7 +432,8 @@ function createItemEl(actionItems, blockInd) {
     listEl.id = itemInd;
     listEl.setAttribute('onfocusout', `updateItem(${blockInd}, ${itemInd})`);
     // Append
-    listEl.appendChild(iconEl);
+    span.appendChild(iconEl);
+    listEl.appendChild(span);
     blockList[blockInd].appendChild(listEl);
   })
 }

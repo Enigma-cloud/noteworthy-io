@@ -6,7 +6,7 @@ C - Unsolved
 / - Cancelled
 None - Not yet started
 
-Notes:
+Main Features:
 1) Edit & Dragging Issue [A]
 2) Ability to create new columns [A]
 3) Ability to create & edit action items [A]
@@ -21,7 +21,7 @@ Notes:
 12) Store blocks in local storage [A]
 13) Save a snapshot of the data [A]
 14) Redesign CSS [B]
-15) Choose colour scheme 
+15) Choose colour scheme [A]
 
 Additional notes:
 a) Add toast notification when saving
@@ -31,3 +31,4 @@ c) Add highlight button to indicate an item is 'high-priority'
 d) Redesign floating action buttons (use button wrapper?)
 e) Swap hover brightness -> lower brightness on hover?
 f) allow user to set name of workspace (to be chosen when user wants to continue from what they've done)
+g) fix cross-out & edit mechanism (encase text to be edited into a p?)
