@@ -22,13 +22,14 @@ Main Features:
 13) Save a snapshot of the data [A]
 14) Redesign CSS [B]
 15) Choose colour scheme [A]
+16) Action item options (e.g. cross-out, highlight, ...)
 
 Additional notes:
 a) Add toast notification when saving
 b) Replace 'Templates' with the App title and animate [A]
 it to go up when the user selects an option
 c) Add highlight button to indicate an item is 'high-priority'
-d) Redesign floating action buttons (use button wrapper?)
-e) Swap hover brightness -> lower brightness on hover?
+d) Redesign floating action buttons (use button wrapper?) [A]
+e) Swap hover brightness -> lower brightness on hover? [A]
 f) allow user to set name of workspace (to be chosen when user wants to continue from what they've done)
-g) fix cross-out & edit mechanism (encase text to be edited into a p?)
+g) fix cross-out & edit mechanism 

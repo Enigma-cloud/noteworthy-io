@@ -378,6 +378,16 @@ ul {
   overflow-x: hidden;
 }
 
+.drag-item-text {
+  width: 90%;
+}
+
+.drag-item-text:focus {
+  background-color: #ffffff;
+  color: black;
+  border-radius: 3px;
+}
+
 .action-block .header,
 .action-block .solid,
 .action-block .solid:hover,
@@ -389,6 +399,7 @@ ul {
   width: 15%;
 }
 
+/* ITEM OPTIONS */
 .dropdown-content {
   display: none;
   position: absolute;
@@ -398,12 +409,13 @@ ul {
   z-index: 1;
 }
 
-.dropdown-content button {
+.dropdown-content a {
   color: white;
   padding: 12px 16px;
   text-decoration: none;
   display: block;
 }
+
 
 
 /* Custom Scrollbar */

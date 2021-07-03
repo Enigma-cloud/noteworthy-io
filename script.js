@@ -129,7 +129,7 @@ function buildEisenhower() {
       name: 'Urgent & Important',
       numOfActions: '10',
       weighting: '10',
-      colour: '#f1faee',
+      colour: '#44cf6c',
       actionItems: ['Being cool', 'Getting stuff done']
     };
     const delegated = {
@@ -399,41 +399,51 @@ function createItemEl(actionItems, blockInd) {
   blockList = document.querySelectorAll('.drag-item-list');
   actionItems.forEach((text, itemInd) => {
     const listEl = document.createElement('li');
-    const span = document.createElement('span');
+    const itemText = document.createElement('div');
+
     const iconEl = document.createElement('i');
+    const itemIcon = document.createElement('div');
+    const itemOptions = document.createElement('div');
+    const itemBtn = document.createElement('a');
+
     // Item
     listEl.classList.add('drag-item');
-    listEl.textContent = text;
+    itemText.classList.add('drag-item-text');
+    itemText.textContent = text;
     listEl.draggable = true;
     listEl.setAttribute('ondragstart', 'drag(event)');
-    // Cross-through
-    span.classList.add('item-icon-container');
+    // Options
+    itemIcon.classList.add('item-icon-container');
+    itemOptions.classList.add('dropdown-content');
     iconEl.classList.add('fas');
-    iconEl.classList.add('fa-times');
+    iconEl.classList.add('fa-ellipsis-v');
     iconEl.setAttribute('crossed', false)
-    iconEl.addEventListener('click', () => {
-      if (iconEl.crossed) {
-        iconEl.classList.replace('fa-check', 'fa-times');
-        iconEl.parentNode.parentNode.style.textDecoration = 'none';
-        iconEl.crossed = false;
-      }
-      else {
-        iconEl.classList.replace('fa-times', 'fa-check');
-        iconEl.parentNode.parentNode.style.textDecoration = 'line-through';
-        iconEl.crossed = true;
-      }
-    })
+    // iconEl.addEventListener('click', () => {
+    //   if (iconEl.crossed) {
+    //     iconEl.classList.replace('fa-check', 'fa-times');
+    //     iconEl.parentNode.style.textDecoration = 'none';
+    //     iconEl.crossed = false;
+    //   }
+    //   else {
+    //     iconEl.classList.replace('fa-times', 'fa-check');
+    //     iconEl.parentNode.style.textDecoration = 'line-through';
+    //     iconEl.crossed = true;
+    //   }
+    // })
     
-    // Double click to edit item
-    listEl.addEventListener('dblclick', () => {
-      listEl.contentEditable = true
+    // Click text to edit item
+    itemText.addEventListener('click', () => {
+      itemText.contentEditable = true
     });
     
     listEl.id = itemInd;
     listEl.setAttribute('onfocusout', `updateItem(${blockInd}, ${itemInd})`);
     // Append
-    span.appendChild(iconEl);
-    listEl.appendChild(span);
+    itemOptions.appendChild(itemBtn);
+    itemIcon.appendChild(iconEl);
+    itemIcon.appendChild(itemOptions);
+    listEl.appendChild(itemText);
+    listEl.appendChild(itemIcon);
     blockList[blockInd].appendChild(listEl);
   })
 }
