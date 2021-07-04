@@ -401,49 +401,85 @@ function createItemEl(actionItems, blockInd) {
     const listEl = document.createElement('li');
     const itemText = document.createElement('div');
 
+    const optionsContainer = document.createElement('div');
+    const iconContainer = document.createElement('div');
     const iconEl = document.createElement('i');
-    const itemIcon = document.createElement('div');
-    const itemOptions = document.createElement('div');
-    const itemBtn = document.createElement('a');
+
+    const listContainer = document.createElement('div');
+    const optionsList = document.createElement('ul');
+    const removeOption = document.createElement('li');
+    const crossOutOption = document.createElement('li');
 
     // Item
     listEl.classList.add('drag-item');
-    itemText.classList.add('drag-item-text');
-    itemText.textContent = text;
     listEl.draggable = true;
     listEl.setAttribute('ondragstart', 'drag(event)');
+    listEl.id = itemInd;
+    listEl.setAttribute('onfocusout', `updateItem(${blockInd}, ${itemInd})`);
+
+    itemText.classList.add('drag-item-text');
+    itemText.setAttribute('crossed', false);
+    itemText.textContent = text;
+    removeOption.textContent = 'Remove item';
+    crossOutOption.textContent = 'Cross out'
+  
     // Options
-    itemIcon.classList.add('item-icon-container');
-    itemOptions.classList.add('dropdown-content');
+    optionsContainer.classList.add('item-options-container');
+
+    listContainer.classList.add('item-list-container');
+    optionsList.classList.add('item-options');
+    optionsList.setAttribute('open', false);
+
+    iconContainer.classList.add('item-icon-container');
     iconEl.classList.add('fas');
     iconEl.classList.add('fa-ellipsis-v');
-    iconEl.setAttribute('crossed', false)
-    // iconEl.addEventListener('click', () => {
-    //   if (iconEl.crossed) {
-    //     iconEl.classList.replace('fa-check', 'fa-times');
-    //     iconEl.parentNode.style.textDecoration = 'none';
-    //     iconEl.crossed = false;
-    //   }
-    //   else {
-    //     iconEl.classList.replace('fa-times', 'fa-check');
-    //     iconEl.parentNode.style.textDecoration = 'line-through';
-    //     iconEl.crossed = true;
-    //   }
-    // })
+    // Show options
+    iconEl.addEventListener('click', () => {
+      if (!optionsList.open) {
+        optionsList.open = true;
+        optionsList.classList.add('active');
+        return
+      }
+      optionsList.open = false;
+      optionsList.classList.remove('active');
+    });
     
+    // Remove item
+    removeOption.addEventListener('click', () => {
+      if (!confirm('Are you sure you want to remove this item?')) {
+        return
+      }
+      updateItem(blockInd, itemInd, true);
+    });
+
+    // Cross out item
+    crossOutOption.addEventListener('click', () => {
+      if (itemText.crossed) {
+        itemText.crossed = false;
+        itemText.style.textDecoration = '';
+      }
+      else {
+        itemText.crossed = true;
+        itemText.style.textDecoration = 'line-through';
+      }
+      
+    });
+
     // Click text to edit item
     itemText.addEventListener('click', () => {
       itemText.contentEditable = true
     });
     
-    listEl.id = itemInd;
-    listEl.setAttribute('onfocusout', `updateItem(${blockInd}, ${itemInd})`);
-    // Append
-    itemOptions.appendChild(itemBtn);
-    itemIcon.appendChild(iconEl);
-    itemIcon.appendChild(itemOptions);
+    // Append to block
+    optionsList.appendChild(removeOption);
+    optionsList.appendChild(crossOutOption);
+    iconContainer.appendChild(iconEl);
+    listContainer.appendChild(optionsList);
+    optionsContainer.appendChild(iconContainer);
+    optionsContainer.appendChild(listContainer);
+
     listEl.appendChild(itemText);
-    listEl.appendChild(itemIcon);
+    listEl.appendChild(optionsContainer);
     blockList[blockInd].appendChild(listEl);
   })
 }
@@ -465,24 +501,27 @@ function rebuildArrays() {
   // Reset arrays and repopulate with data
   blockList = document.querySelectorAll('.drag-item-list');
   for (i = 0; i < blockList.length; i++) {
-    blockObjects[i].actionItems = Array.from(blockList[i].children).map(item => item.textContent);
+    blockObjects[i].actionItems = Array.from(blockList[i].children).map(item => item.childNodes[0].textContent);
   }
   // Update DOM
   updateDOM();
 }
 
 // Update Item - Delete if necessary, or update Array value
-function updateItem(blockInd, itemInd) {
+function updateItem(blockInd, itemInd, textDelete=false) {
   const selectedArray = blockObjects[blockInd].actionItems;
   const selectedColumnEl = document.querySelectorAll('.drag-item-list')[blockInd].children;
   
   // Remove item if empty and is not being dragged
   if (!dragging) {
-    if (!selectedColumnEl[itemInd].textContent) {
+    if (!selectedColumnEl[itemInd].childNodes[0].textContent) {
+      delete selectedArray[itemInd];
+    }
+    else if (textDelete) {
       delete selectedArray[itemInd];
     }
     else {
-      selectedArray[itemInd] = selectedColumnEl[itemInd].textContent;
+      selectedArray[itemInd] = selectedColumnEl[itemInd].childNodes[0].textContent;
     }
     updateDOM();
   }
