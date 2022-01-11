@@ -9,3 +9,4 @@ To visit the latest live version of the app, go to this [link](https://enigma-cl
 
 ## Acknowledgements
   - [Jacinto Design](https://github.com/JacintoDesign)
+  - [Font Awesome](https://fontawesome.com/)
